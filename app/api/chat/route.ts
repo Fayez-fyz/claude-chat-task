@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       messages: UIMessage[];
       model: string;
       webSearch: boolean;
-      docIds?: DocId[]; 
+      docIds?: DocId[];
     } = await req.json();
 
     const latestMessage = (
@@ -65,7 +65,6 @@ export async function POST(req: Request) {
 
     let context = "";
     if (docIds && docIds.length > 0) {
-  
       for (const doc of docIds) {
         if (doc.type !== "application/pdf") {
           console.warn(`Skipping non-PDF document: ${doc.name}`);
@@ -97,13 +96,16 @@ export async function POST(req: Request) {
 
     const result = streamText({
       model: google(model),
-      // tools: webSearch ? {
-      //   google_search:  google.tools.googleSearch({}),
-      // } : undefined,
+      tools: webSearch
+        ? ({
+            google_search: google.tools.googleSearch({}),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any)
+        : undefined,
       messages: convertToModelMessages(messages),
       system: systemPrompt,
       maxOutputTokens: 1000,
-      onFinish: async ({ usage, response }) => {      
+      onFinish: async ({ usage, response }) => {
         console.log(usage, "Usage in chat API");
         await ChatDatabaseOperation({
           id,
