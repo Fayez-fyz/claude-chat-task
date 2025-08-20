@@ -19,6 +19,7 @@ export async function fetchChatMessages(
     id: msg.id,
     role: msg.role as "user" | "assistant",
     content: msg.content,
+    is_liked: msg.is_liked,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parts: (msg.parts as any) || [],
     createdAt: new Date(msg.created_at),

@@ -16,12 +16,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, ChevronUp, LogOut, User } from "lucide-react";
+import { Plus, ChevronUp, LogOut, User, UserRound } from "lucide-react";
 import { logoutAction } from "@/app/actions/supabaseLogout";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { UIDataTypes, UIMessage, UITools } from "ai";
 import { ChatSessionList } from "./chat/chat.sessions";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 interface UserProfile {
   name: string;
   email: string;
@@ -78,32 +79,24 @@ export function AppSidebar({
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-[#0f0f0e] hover:text-white bg-[#0f0f0e] text-white "
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16  hover:bg-[#0f0f0e] hover:text-white bg-[#0f0f0e] text-white "
                 >
                   <div className="flex items-center gap-2 flex-1">
-                    {userProfile?.avatar ? (
-                      <Image
-                        src={userProfile.avatar}
-                        alt={userProfile.name || "User"}
-                        width={32}
-                        height={32}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-sidebar-primary/10 flex items-center justify-center">
-                        <User className="w-4 h-4 text-sidebar-primary" />
-                      </div>
-                    )}
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      {/* <span className="truncate font-semibold">
+                    <Avatar className="group-[.is-user]:block group-[.is-assistant]:hidden size-11">
+                      <AvatarFallback className="text-white text-lg bg-black">
+                        {userProfile?.name ? userProfile.name[0] : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col gap-0.5 ">
+                      <h2 className="text-sm font-medium text-white">
                         {userProfile?.name || "User"}
-                      </span> */}
-                      <span className="truncate text-xs text-sidebar-foreground/70">
-                        {userProfile?.email || "user@example.com"}
-                      </span>
+                      </h2>
+                      <p className="text-sm font-normal text-muted-foreground">
+                        {userProfile?.email || "Email"}
+                      </p>
                     </div>
-                  </div>
                   <ChevronUp className="ml-auto size-4" />
+                  </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent

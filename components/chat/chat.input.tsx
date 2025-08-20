@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { ChatStatus } from "ai";
 import { UploadedFile } from "@/hooks/useFileUpload";
-import { formatFileSize } from "@/app/utils/size-formatter";
+import { formatFileSize } from "@/utils/size-formatter";
 
 interface ChatInputProps {
   input: string;

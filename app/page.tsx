@@ -12,7 +12,7 @@ export default function Home() {
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
             <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/"}>Claude AI</Link>
+              <Link href={"/"} className="text-xl font-semibold">Claude</Link>
             </div>
             {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
           </div>
@@ -21,9 +21,9 @@ export default function Home() {
           <Hero />
         </div>
 
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-2 py-16">
           <p>
-            Powered by{" "}
+            Developed by{" "}
             <a
               href="https://fayez.vercel.app/"
               target="_blank"

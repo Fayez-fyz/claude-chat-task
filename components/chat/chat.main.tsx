@@ -88,7 +88,7 @@ const { data: chatMessages } = useQuery({
     enabled: !!userId,
   });
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status,regenerate } = useChat({
     messages: chatMessages || [],
     generateId: () => uuidv4(),
     id: currentChatId.current || undefined,
@@ -199,7 +199,12 @@ const { data: chatMessages } = useQuery({
                 messages.length === 0 ? "justify-center gap-10" : ""
               )}
             >
-              <ChatMessages messages={messages} status={status} />
+             <ChatMessages 
+  messages={messages} 
+  status={status} 
+  chatId={currentChatId.current} 
+  userProfile={userProfile}
+/>
               <ChatInput
                 input={input}
                 setInput={setInput}

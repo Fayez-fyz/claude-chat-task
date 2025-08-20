@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "ChatFYZ - Chat with your files",
+  title: "Claude AI Chat - Fayez",
   description: "Chat with your files using AI",
 };
 

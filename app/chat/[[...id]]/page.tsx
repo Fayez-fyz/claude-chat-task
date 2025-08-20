@@ -52,7 +52,7 @@ export default async function Page({ params }: PageProps) {
         chatId={id || undefined}
         userId={data.user.id}
         userProfile={{
-          name: data.user.user_metadata.name || "User",
+          name: data.user.user_metadata.full_name || "User",
           email: data.user.email || "",
           avatar: data.user.user_metadata.avatar_url || undefined,
         }}

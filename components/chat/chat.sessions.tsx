@@ -91,6 +91,7 @@ export function ChatSessionList({
       
       if (id === deletedSessionId) {
         router.replace(`/chat/${uuidv4()}`);
+        
       }
     },
     onError: (error) => {
