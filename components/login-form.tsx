@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
+import { v4 as uuidv4 } from "uuid";
 export function LoginForm({
   className,
   ...props
@@ -38,7 +38,7 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      router.push("/chat");
+      router.push(`/chat/${uuidv4()}`);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {

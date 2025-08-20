@@ -22,9 +22,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-
-export function NavMain({
+import { v4 as uuidv4 } from "uuid";
+import { UIDataTypes, UIMessage, UITools } from "ai";
+export function ChatSessionList({
   chatSessions,
+  messages,
 }: {
   chatSessions:
     | {
@@ -32,21 +34,18 @@ export function NavMain({
         chat_name: string;
       }[]
     | undefined;
+     messages:UIMessage<unknown, UIDataTypes, UITools>[];
 }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const params = useParams<{ id: string | string[] }>();
-  
-  // Safely extract the ID - handle both string and string[] cases
   const id = Array.isArray(params.id) ? params.id[0] : params.id || "";
-  
   const [searchTerm, setSearchTerm] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [newChatName, setNewChatName] = useState("");
   const supabase = createClient();
   const queryClient = useQueryClient();
 
-  // Mutation for renaming chat session
   const renameMutation = useMutation({
     mutationFn: async ({ id, newName }: { id: string; newName: string }) => {
       const { error } = await supabase
@@ -69,10 +68,8 @@ export function NavMain({
     },
   });
 
-  // Mutation for deleting chat session and its messages
   const deleteMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      // Delete messages first
       const { error: messagesError } = await supabase
         .from("chat_messages")
         .delete()
@@ -80,7 +77,6 @@ export function NavMain({
 
       if (messagesError) throw messagesError;
 
-      // Then delete the session
       const { error: sessionError } = await supabase
         .from("chat_session")
         .delete()
@@ -93,18 +89,16 @@ export function NavMain({
       queryClient.invalidateQueries({ queryKey: ["chat_messages"] });
       toast.success("Chat session deleted successfully");
       
-      // If we're currently viewing the deleted session, redirect to /chat
       if (id === deletedSessionId) {
-        router.replace("/chat");
+        router.replace(`/chat/${uuidv4()}`);
       }
     },
     onError: (error) => {
       console.error("Error deleting chat session:", error);
       toast.error("Failed to delete chat session");
-    },
+    },  // Mutation for renaming chat session
   });
 
-  // Filter chat sessions based on search term
   const filteredChatSessions = chatSessions?.filter((item) =>
     item.chat_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -120,11 +114,8 @@ export function NavMain({
     }
   };
 
-  console.log(filteredChatSessions, 'chat sessions');
-
   return (
     <SidebarGroup className="px-2 py-1">
-      {/* Search Input */}
       <div className="relative mb-2">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-sidebar-foreground/50" />
         <input
@@ -137,8 +128,8 @@ export function NavMain({
       </div>
 
       <SidebarMenu>
-        {filteredChatSessions &&
-          filteredChatSessions.map((item: { id: string; chat_name: string }) => (
+        {filteredChatSessions && filteredChatSessions.length ? (
+           filteredChatSessions.map((item: { id: string; chat_name: string }) => (
             <SidebarMenuItem key={item.id}>
               {editingSessionId === item.id ? (
                 <Input
@@ -183,7 +174,13 @@ export function NavMain({
                 </Link>
               )}
             </SidebarMenuItem>
-          ))}
+          ))
+        ) : (
+          <SidebarMenuItem className="flex justify-center items-center h-20">
+            <span className="text-sm text-white/30 ">No chat sessions found</span>
+          </SidebarMenuItem>
+        )
+         }
       </SidebarMenu>
     </SidebarGroup>
   );

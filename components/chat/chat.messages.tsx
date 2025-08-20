@@ -107,7 +107,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ messages, status }) => {
           })}
           {status === "submitted" && <Loader />}
         </ConversationContent>
-        <ConversationScrollButton />
+        <ConversationScrollButton className="!bg-black/60" />
       </Conversation>
     </>
   );

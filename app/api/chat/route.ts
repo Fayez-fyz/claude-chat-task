@@ -14,7 +14,6 @@ import {
 import { getRetriever } from "@/lib/retriever";
 import { Document } from "@langchain/core/documents";
 
-// Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 interface DocId {
@@ -44,17 +43,16 @@ export async function POST(req: Request) {
       id,
       messages,
       model,
-      // webSearch,
-      docIds, // Array of document objects
+      webSearch,
+      docIds,
     }: {
       id: string;
       messages: UIMessage[];
       model: string;
-      // webSearch: boolean;
-      docIds?: DocId[]; // Optional array of document objects
+      webSearch: boolean;
+      docIds?: DocId[]; 
     } = await req.json();
 
-    // Get the latest user message (prompt)
     const latestMessage = (
       messages[messages.length - 1].parts[0] as { text: string }
     ).text;
@@ -67,7 +65,7 @@ export async function POST(req: Request) {
 
     let context = "";
     if (docIds && docIds.length > 0) {
-      // Retrieve document chunks for each docId
+  
       for (const doc of docIds) {
         if (doc.type !== "application/pdf") {
           console.warn(`Skipping non-PDF document: ${doc.name}`);
@@ -76,7 +74,6 @@ export async function POST(req: Request) {
         try {
           const retriever = await getRetriever(doc.id);
           const retrievedDocs = await retriever.invoke(latestMessage);
-          // Add document chunks to context with document name for clarity
           const docContext = retrievedDocs
             .map(
               (d: Document, index: number) =>
@@ -93,22 +90,20 @@ export async function POST(req: Request) {
       }
     }
 
-    // Prepare the system prompt with document context (if any)
     const systemPrompt =
       docIds && context
         ? `You are a helpful assistant that can answer questions and help with tasks. Use the following document context to inform your response:\n\n${context}`
         : "You are a helpful assistant that can answer questions and help with tasks";
 
-    const result =  streamText({
+    const result = streamText({
       model: google(model),
-      // tools: webSearch
-      //   ? {
-      //       google_search: google.tools.googleSearch({}),
-      //     }
-      //   : undefined,
+      // tools: webSearch ? {
+      //   google_search:  google.tools.googleSearch({}),
+      // } : undefined,
       messages: convertToModelMessages(messages),
       system: systemPrompt,
-      onFinish: async ({ usage, response }) => {
+      maxOutputTokens: 1000,
+      onFinish: async ({ usage, response }) => {      
         console.log(usage, "Usage in chat API");
         await ChatDatabaseOperation({
           id,
@@ -127,7 +122,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // Send sources and reasoning back to the client
     return result.toUIMessageStreamResponse({
       sendSources: true,
       sendReasoning: true,

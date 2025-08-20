@@ -6,8 +6,6 @@ import { redirect } from "next/navigation";
 export async function logoutAction() {
   try {
     const supabase = await createClient();
-
-    // Sign out from Supabase
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -20,6 +18,5 @@ export async function logoutAction() {
     throw error;
   }
 
-  // Redirect to login page or home page after logout
-  redirect("/auth/login"); // Change this to your login route
+  redirect("/auth/login");
 }

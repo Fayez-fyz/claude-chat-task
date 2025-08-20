@@ -43,14 +43,13 @@ export const ChatDatabaseOperation = async ({
   const lastUserMessage = userMessage[userMessage.length - 1];
 
   try {
-    // Check if chat session exists
+  
     const { data: chatSession, error: chatSessionError } = await supabase
       .from("chat_session")
       .select("id")
       .eq("id", id)
       .single();
 
-    // Create new chat session if it doesn't exist
     if (chatSessionError || !chatSession) {
       const { error: createError } = await supabase
         .from("chat_session")
@@ -59,7 +58,7 @@ export const ChatDatabaseOperation = async ({
           user_id: userId,
           chat_name: (
             lastUserMessage?.parts[0] as { text: string }
-          )?.text.slice(0, 50), // Limit chat_name length
+          )?.text.slice(0, 50), 
         });
 
       if (createError) {
@@ -69,7 +68,6 @@ export const ChatDatabaseOperation = async ({
       }
     }
 
-    // Store user message first (without parent_id)
     const { data: userMessageData, error: userMessageError } = await supabase
       .from("chat_messages")
       .insert({
@@ -79,8 +77,8 @@ export const ChatDatabaseOperation = async ({
         content:
           lastUserMessage.parts[0]?.type === "text"
             ? lastUserMessage.parts[0]?.text || ""
-            : "", // Use first part's text if available
-        parts: lastUserMessage.parts || [], // Default to empty array if parts is undefined
+            : "", 
+        parts: lastUserMessage.parts || [], 
         tokens: usage?.inputTokens || 0,
       })
       .select("id")
@@ -94,7 +92,7 @@ export const ChatDatabaseOperation = async ({
       );
     }
 
-    // Store assistant message with user message ID as parent_id
+    
     console.log(response  ,'response.messages');
     const assistantMessage = response.messages[response.messages.length - 1];
 
@@ -104,10 +102,10 @@ export const ChatDatabaseOperation = async ({
         chat_id: id,
         user_id: userId,
         role: "assistant",
-        content: assistantMessage.content[0]?.text || "", // Use first part's text if available
-        parts: assistantMessage.content || [], // Default to empty array if parts is undefined
+        content: assistantMessage.content[0]?.text || "",
+        parts: assistantMessage.content || [], 
         tokens: usage?.outputTokens || 0,
-        parent_id: userMessageData.id, // Link to user message
+        parent_id: userMessageData.id, 
       });
 
     if (assistantMessageError) {

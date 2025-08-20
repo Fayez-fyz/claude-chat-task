@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
-
+import { v4 as uuidv4 } from "uuid";
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -79,7 +79,7 @@ export async function updateSession(request: NextRequest) {
   // If user is authenticated and trying to access auth pages, redirect to /chat
   if (user && (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/signup') || pathname.startsWith('/auth/forgot-password') || pathname === '/')) {
     const url = request.nextUrl.clone();
-    url.pathname = "/chat"; // Changed from "/" to "/chat"
+    url.pathname = `/chat/${uuidv4()}`; // Changed from "/" to "/chat"
     return NextResponse.redirect(url);
   }
 

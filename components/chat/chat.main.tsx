@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
-import ChatMessages from "./chat-messages";
+import ChatMessages from "./chat.messages";
 import ChatInput from "./chat.input";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
@@ -66,17 +66,15 @@ const ChatMain: FC<ChatMainProps> = ({ chatId, userId, userProfile }) => {
   const hasNavigated = useRef(false);
   const currentChatId = useRef(chatId);
 
-  // File upload hook
   const { attachedFiles, isUploading, uploadFiles, removeFile } = useFileUpload({
     userId,
     maxFiles: 10,
-    maxFileSize: 10 * 1024 * 1024, // 10MB
+    maxFileSize: 10 * 1024 * 1024, 
     onFilesChange: (files) => {
       console.log("Files changed:", files);
     },
   });
 
-  // Only fetch chat messages if we have a valid chatId
 const { data: chatMessages } = useQuery({
   queryKey: ["chat_messages", currentChatId.current ?? ""],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,13 +103,10 @@ const { data: chatMessages } = useQuery({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Prepare the message data with file attachments
     const messageData: MessageData = {
       text: input,
     };
 
-    // Prepare docIds array from attachedFiles
     const docIds = attachedFiles.length > 0
       ? attachedFiles.map((file) => ({
           id: file.id,
@@ -122,12 +117,10 @@ const { data: chatMessages } = useQuery({
         }))
       : undefined;
 
-    // Add file attachments to messageData if any
     if (attachedFiles.length > 0) {
       messageData.attachments = docIds;
     }
 
-    // Navigate to chat/[sessionId] if we're still on /chat
     if (!chatId && !hasNavigated.current && currentChatId.current) {
       hasNavigated.current = true;
       if (input.trim()) {
@@ -137,20 +130,19 @@ const { data: chatMessages } = useQuery({
             model: model,
             webSearch: webSearch,
             files: attachedFiles.length > 0 ? attachedFiles : undefined,
-            docIds, // Include docIds array
+            docIds,
           },
         });
         setInput("");
       }
     } else {
-      // If chatId is provided, send message directly
       if (input.trim()) {
         sendMessage(messageData, {
           body: {
             model: model,
             webSearch: webSearch,
             files: attachedFiles.length > 0 ? attachedFiles : undefined,
-            docIds, // Include docIds array
+            docIds,
           },
         });
         setInput("");
@@ -158,7 +150,6 @@ const { data: chatMessages } = useQuery({
     }
   };
 
-  // Generate session ID once and reuse it
   useEffect(() => {
     if (chatId) {
       currentChatId.current = chatId;
@@ -178,6 +169,8 @@ const { data: chatMessages } = useQuery({
         <AppSidebar
           chatSessions={chatSessions || []}
           userProfile={userProfile}
+          messages={messages}
+          chatId={currentChatId.current}
           className="hidden md:block"
           style={{
             width: "var(--sidebar-width)",
@@ -202,7 +195,7 @@ const { data: chatMessages } = useQuery({
           <div className="max-w-4xl mx-auto p-6 relative size-full h-screen overflow-hidden">
             <div
               className={cn(
-                "flex flex-col h-full gap-10",
+                "flex flex-col h-full gap-10 scrollbar-hide",
                 messages.length === 0 ? "justify-center gap-10" : ""
               )}
             >

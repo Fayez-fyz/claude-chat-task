@@ -1,6 +1,4 @@
-
-import * as React from "react"
-import { NavMain } from "@/components/nav-main"
+import * as React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,8 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +19,9 @@ import {
 import { Plus, ChevronUp, LogOut, User } from "lucide-react";
 import { logoutAction } from "@/app/actions/supabaseLogout";
 import Image from "next/image";
-
+import { v4 as uuidv4 } from "uuid";
+import { UIDataTypes, UIMessage, UITools } from "ai";
+import { ChatSessionList } from "./chat/chat.sessions";
 interface UserProfile {
   name: string;
   email: string;
@@ -31,6 +31,8 @@ interface UserProfile {
 export function AppSidebar({
   chatSessions,
   userProfile,
+  messages,
+  chatId,
   ...props
 }: {
   chatSessions:
@@ -40,26 +42,25 @@ export function AppSidebar({
       }[]
     | undefined;
   userProfile?: UserProfile;
+  messages: UIMessage<unknown, UIDataTypes, UITools>[];
+  chatId: string | undefined;
 } & React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props}
-    className="!bg-[#1f1e1d]"
-    >
-    <SidebarHeader>
+    <Sidebar {...props} className="!bg-[#1f1e1d]">
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex justify-between items-center">
-            <SidebarMenuButton
-              className=" !px-2 !py-1  "
-              size="lg"
-              asChild
-            >
+            <SidebarMenuButton className=" !px-2 !py-1  " size="lg" asChild>
               <a href="#">
                 <div className="flex flex-col gap-0.5 leading-none">
                   <h2 className="text-xl font-semibold">Claude</h2>
                 </div>
               </a>
             </SidebarMenuButton>
-            <Link href="/chat" className="bg-tertiary rounded-full p-1.5 hover:bg-tertiary/80 transition-colors">
+            <Link
+              href={`/chat/${messages.length > 0 ? uuidv4() : chatId}`}
+              className="bg-tertiary rounded-full p-1.5 hover:bg-tertiary/80 transition-colors"
+            >
               <Plus className="h-4 w-4 text-white" />
             </Link>
           </SidebarMenuItem>
@@ -67,7 +68,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent className="flex flex-col">
         <div className="flex-1 overflow-hidden">
-          <NavMain chatSessions={chatSessions} />
+          <ChatSessionList chatSessions={chatSessions} messages={messages} />
         </div>
       </SidebarContent>
       <SidebarFooter>
@@ -77,7 +78,7 @@ export function AppSidebar({
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-white hover:text-black"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-[#0f0f0e] hover:text-white bg-[#0f0f0e] text-white "
                 >
                   <div className="flex items-center gap-2 flex-1">
                     {userProfile?.avatar ? (
@@ -127,5 +128,5 @@ export function AppSidebar({
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

@@ -1,4 +1,3 @@
-// lib/supabase/queries.ts
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../database.types";
 
@@ -16,7 +15,6 @@ export async function fetchChatMessages(
     console.error("Error fetching messages:", error);
     throw new Error("Failed to fetch chat messages");
   }
-  // Map Supabase data to the ai-sdk Message format
   return data.map((msg) => ({
     id: msg.id,
     role: msg.role as "user" | "assistant",

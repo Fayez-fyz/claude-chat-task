@@ -12,9 +12,16 @@ import {
   PromptInputToolbar,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
-import { GlobeIcon, PlusIcon, FileTextIcon, XIcon, Loader2Icon } from "lucide-react";
+import {
+  GlobeIcon,
+  PlusIcon,
+  FileTextIcon,
+  XIcon,
+  Loader2Icon,
+} from "lucide-react";
 import { ChatStatus } from "ai";
 import { UploadedFile } from "@/hooks/useFileUpload";
+import { formatFileSize } from "@/app/utils/size-formatter";
 
 interface ChatInputProps {
   input: string;
@@ -26,7 +33,6 @@ interface ChatInputProps {
   handleSubmit: (e: React.FormEvent) => void;
   status: ChatStatus;
   models: { name: string; value: string }[];
-  // File upload props
   attachedFiles: UploadedFile[];
   isUploading: boolean;
   uploadFiles: (files: File[]) => Promise<void>;
@@ -59,21 +65,11 @@ const ChatInput: FC<ChatInputProps> = ({
     if (files.length > 0) {
       uploadFiles(files);
     }
-    // Reset the input so the same file can be selected again
-    e.target.value = '';
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    e.target.value = "";
   };
 
   return (
     <div className="space-y-3">
-      {/* File Upload List */}
       {attachedFiles.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {attachedFiles.map((file) => (
@@ -91,7 +87,10 @@ const ChatInput: FC<ChatInputProps> = ({
                 </div>
               </div>
               {file.uploading ? (
-                <Loader2Icon size={14} className="animate-spin text-blue-400 flex-shrink-0" />
+                <Loader2Icon
+                  size={14}
+                  className="animate-spin text-blue-400 flex-shrink-0"
+                />
               ) : (
                 <button
                   onClick={() => removeFile(file.id)}
@@ -106,12 +105,15 @@ const ChatInput: FC<ChatInputProps> = ({
         </div>
       )}
 
-      {/* Chat Input */}
       <PromptInput onSubmit={handleSubmit} className="mt-1 border-white/10 p-1">
         <PromptInputTextarea
           onChange={(e) => setInput(e.target.value)}
           value={input}
-          placeholder={attachedFiles.length > 0 ? "Ask about your uploaded files..." : "Type your message..."}
+          placeholder={
+            attachedFiles.length > 0
+              ? "Ask about your uploaded files..."
+              : "Type your message..."
+          }
         />
         <PromptInputToolbar>
           <PromptInputTools>
@@ -163,8 +165,6 @@ const ChatInput: FC<ChatInputProps> = ({
             />
           </div>
         </PromptInputToolbar>
-        
-        {/* Hidden file input */}
         <input
           ref={fileInputRef}
           type="file"
