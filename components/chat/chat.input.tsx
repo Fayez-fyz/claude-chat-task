@@ -112,7 +112,7 @@ const ChatInput: FC<ChatInputProps> = ({
           placeholder={
             attachedFiles.length > 0
               ? "Ask about your uploaded files..."
-              : "Type your message..."
+              : "How can I help you today?"
           }
         />
         <PromptInputToolbar>
